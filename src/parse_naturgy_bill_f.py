@@ -65,7 +65,7 @@ def parse_naturgy_bill(file):
     return code is 0 (SUCCESS) or 0 otherwise.
     """
 
-    if not file.endswith('.xls'):
+    if ((not file.endswith('.xls')) and (not file.endswith('xlsx'))):
         return(-1, 0)
 
     # Open the excel file
@@ -116,11 +116,17 @@ def parse_naturgy_bill(file):
     
     # Output the JSON
     for row in range(CFG['start_off'], last_row+1):
+        
+        if (sh.cell_value(rowx=row, colx=CFG['type']).lower() == "energía activa total"):
+            c_type = 0
+        else:
+            c_type = 1
+    
         out['data'].append(
             {'date':sh.cell_value(rowx=row, colx=CFG['date']),
              'timefrom':sh.cell_value(rowx=row, colx=CFG['timefrom']),
              'timeto':sh.cell_value(rowx=row, colx=CFG['timeto']),
-             'type':sh.cell_value(rowx=row, colx=CFG['type']),
+             'type':c_type,
              'consumption':sh.cell_value(rowx=row, colx=CFG['consumption']),
              'price':sh.cell_value(rowx=row, colx=CFG['price'])})
     

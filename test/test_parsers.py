@@ -7,7 +7,9 @@ from importlib.machinery import SourceFileLoader
 tst = SourceFileLoader("parse_naturgy_bill", "../src/parse_naturgy_bill_f.py").load_module()
 
 # Run SWUT
-[outCode, data] = tst.parse_naturgy_bill('../input/FEXXXXXXXXXXXXXX.xls')
+#[outCode, data] = tst.parse_naturgy_bill('../input/FEXXXXXXXXXXXXXX.xls')
+#[outCode, data] = tst.parse_naturgy_bill('../input/20170301_f_FE17137004200522.xls')
+[outCode, data] = tst.parse_naturgy_bill('../input/20170502_f_FE17137008448840.xls')
 
 # Verify Results
 if (outCode != 0):
@@ -32,6 +34,8 @@ if (data['data'][5]['consumption'] != 0.089):
     exit()
 
 print('Test SUCCESS')
+
+print(data['data'][1])
 
 
 
