@@ -11,7 +11,13 @@
 #
 # @version v1.0 | 20210617 | cavt |
 # Initial version
-#
+# @version v1.1 | 20210812 | cavt |
+# Modify the parser to support the three sections (PUNTA, LLANO, VALLE) from
+# the new billing symtem in Spain
+# @version v1.2 | 20210914 | cavt |
+# For some reason Naturgy is providing in the data document the energy price as 0.0,
+# what it is clearly wrong, so I have to workaround it to obtain it from the total
+# price of each row.
 # Imports
 #
 
@@ -31,6 +37,7 @@ CFG['timeto'] = 2
 CFG['type'] = 3
 CFG['consumption'] = 4
 CFG['price'] = 5
+CFG['total'] = 6
 
 ##
 # Find the last row with data
@@ -119,8 +126,14 @@ def parse_naturgy_bill(file):
         
         if (sh.cell_value(rowx=row, colx=CFG['type']).lower() == "energía activa total"):
             c_type = 0
-        else:
+        elif (sh.cell_value(rowx=row, colx=CFG['type']).lower() == "energía activa punta"):
             c_type = 1
+        elif (sh.cell_value(rowx=row, colx=CFG['type']).lower() == "energía activa llano"):
+            c_type = 2
+        elif (sh.cell_value(rowx=row, colx=CFG['type']).lower() == "energía activa valle"):
+            c_type = 3
+        else:
+            c_type = 4
     
         out['data'].append(
             {'date':sh.cell_value(rowx=row, colx=CFG['date']),
@@ -128,7 +141,9 @@ def parse_naturgy_bill(file):
              'timeto':sh.cell_value(rowx=row, colx=CFG['timeto']),
              'type':c_type,
              'consumption':sh.cell_value(rowx=row, colx=CFG['consumption']),
-             'price':sh.cell_value(rowx=row, colx=CFG['price'])})
+             'price': (float(sh.cell_value(rowx=row, colx=CFG['total']))  / float(sh.cell_value(rowx=row, colx=CFG['consumption'])))})
+#             'price':sh.cell_value(rowx=row, colx=CFG['price'])})
+	
     
     # Output the JSON with the data
     return(0, json.dumps(out))
